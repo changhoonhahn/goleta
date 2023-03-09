@@ -31,8 +31,8 @@ if torch.cuda.is_available():
 dat_dir = '/tigress/chhahn/cgpop/'
 data = np.loadtxt(os.path.join(dat_dir, 'camels_tng.omega_x.down.dat'), skiprows=1, unpack=True)
 
-data_omega = data.T[:,:5]     # cosmological and hydrodynamical parameters
-data_photo = data.T[:,5:]     # measured photometry and noise
+data_omega = data.T[:,:6]     # cosmological and hydrodynamical parameters
+data_photo = data.T[:,6:]     # measured photometry and noise
 
 ###################################################################
 # train normalizing flows
@@ -114,6 +114,24 @@ def Objective(trial):
     qphi    = anpe.build_posterior(p_theta_x_est)
     fqphi   = os.path.join(output_dir, study_name, '%s.%i.pt' % (study_name, trial.number))
     torch.save(qphi, fqphi)
+
+    # calculat ranks:  
+    rank_thetas = []
+    for i in range(x_test.shape[0]):
+        # sample posterior p(theta | x_test_i)
+        y_prime = qphi.sample((10000,),
+                x=torch.as_tensor(x_test[i].astype(np.float32)).to(device),
+                show_progress_bars=False)
+        y_prime = np.array(y_prime.detach().cpu())
+
+        # calculate percentile score and rank
+        rank_theta = []
+        for itheta in range(y_test.shape[1]):
+            rank_theta.append(np.sum(y_prime[:,itheta] < y_test[i,itheta]))
+        rank_thetas.append(rank_theta)
+    rank_thetas = np.array(rank_thetas) 
+
+    np.save(os.path.join(output_dir, study_name, '%s.%i.rank.npy' % (study_name, trial.number)), rank_thetas)
         
     best_valid_log_prob = anpe._summary['best_validation_log_prob'][0]
     return -1*best_valid_log_prob
