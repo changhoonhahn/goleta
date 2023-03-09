@@ -151,13 +151,13 @@ def Objective(trial):
 
     # save trained NPE  
     fqphi   = os.path.join(output_dir, study_name, '%s.%i.pt' % (study_name, trial.number))
-    torch.save(qphi, fqphi)
+    torch.save(best_npe, fqphi)
 
     # calculat ranks:  
     rank_thetas = []
     for i in np.arange(x_test.shape[0]):
         # sample posterior p(theta | x_test_i)
-        y_prime = qphi.sample((10000,),
+        y_prime = best_npe.sample((10000,),
                 x=torch.as_tensor(x_test[i].astype(np.float32)).to(device),
                 show_progress_bars=False)
         y_prime = np.array(y_prime.detach().cpu())
