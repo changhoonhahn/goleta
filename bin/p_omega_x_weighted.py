@@ -58,6 +58,9 @@ valid_loader = torch.utils.data.DataLoader(
             torch.from_numpy(data_w_lhc[ishuffle[N_train:N_train+N_valid]])),
         batch_size=128, shuffle=True)
 
+test_omega = data_omega[ishuffle[-2000:]]
+test_photo = data_photo[ishuffle[-2000:]]
+
 # Optuna Parameters
 n_trials    = 1000
 study_name  = 'qphi.omega_x.weighted'
@@ -155,17 +158,17 @@ def Objective(trial):
 
     # calculat ranks:  
     rank_thetas = []
-    for i in np.arange(x_test.shape[0]):
+    for i in np.arange(test_omega.shape[0]):
         # sample posterior p(theta | x_test_i)
         y_prime = best_npe.sample((10000,),
-                x=torch.as_tensor(x_test[i].astype(np.float32)).to(device),
+                x=torch.as_tensor(test_photo[i].astype(np.float32)).to(device),
                 show_progress_bars=False)
         y_prime = np.array(y_prime.detach().cpu())
 
         # calculate percentile score and rank
         rank_theta = []
-        for itheta in range(y_test.shape[1]):
-            rank_theta.append(np.sum(y_prime[:,itheta] < y_test[i,itheta]))
+        for itheta in range(test_omega.shape[1]):
+            rank_theta.append(np.sum(y_prime[:,itheta] < test_omega[i,itheta]))
         rank_thetas.append(rank_theta)
     rank_thetas = np.array(rank_thetas) 
 

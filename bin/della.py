@@ -84,6 +84,44 @@ def train_weighted_optuna(hr=2):
     return None
 
 
-#for i in range(10): 
-train_weighted_optuna(hr=2)
+def cosmo_infer(fnde, hr=2, gpu=True): 
+    ''' train p(Omega|X) with weights
+    '''
+
+    script = '\n'.join([
+        "#!/bin/bash", 
+        "#SBATCH -J cosmo_infer",
+        "#SBATCH --output=o/_cosmo_infer", 
+        "#SBATCH --nodes=1", 
+        "#SBATCH --time=%s:59:59" % str(hr-1).zfill(2),
+        "#SBATCH --export=ALL",
+        "#SBATCH --mem=4G", 
+        ['', "#SBATCH --gres=gpu:1"][gpu], 
+        "#SBATCH --mail-type=all",
+        "#SBATCH --mail-user=chhahn@princeton.edu",
+        "", 
+        'now=$(date +"%T")', 
+        'echo "start time ... $now"', 
+        "", 
+        "source ~/.bashrc", 
+        "conda activate sbi", 
+        "",
+        "python /home/chhahn/projects/CGPop/bin/cosmo_infer.py %s" % fnde,
+        "",
+        'now=$(date +"%T")', 
+        'echo "end time ... $now"', 
+        ""]) 
+
+    # create the script.sh file, execute it and remove it
+    f = open('script.slurm','w')
+    f.write(script)
+    f.close()
+    os.system('sbatch script.slurm')
+    os.system('rm script.slurm')
+    return None
+
+cosmo_infer('/tigress/chhahn/cgpop/ndes/qphi.omega_x/qphi.omega_x.16.pt', hr=1, gpu=True)
+
+#for i in range(5): 
+#    train_weighted_optuna(hr=6)
 #    train_optuna(hr=6)
