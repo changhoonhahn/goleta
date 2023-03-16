@@ -1,4 +1,4 @@
-# Cosmology with Galaxy Populations (CGPop)
+# Cosmology with Photometry of Many Galaxies
 The goal of this project is to infer cosmological parameters ($\Omega_m$, $\sigma_8$) from observations of galaxy populations:
 
 $$p(\Omega_m, \sigma_8 | \{ X_i \})$$
