@@ -97,6 +97,23 @@
 \author{Francisco Villaescusa-Navarro}
 
 \begin{abstract}
+    We present the first cosmological constraints from photometric observations
+    of galaxies. 
+    Villaescusa-Navarro+(2022) recently demonstrated that a galaxy's internal
+    physical properties contain a significant amount of cosmological
+    information: *i.e.* cosmology with one galaxy. These physical properties,
+    however, cannot be directly measured from observations. In this talk, I
+    will present how we can go beyond theoretical demonstrations to infer
+    cosmological constraints from actual galaxy observables (*e.g.* optical
+    SDSS photometry) using simulation-based inference and neural density
+    estimation on the CAMELS dataset. While the cosmological information from
+    photometric observations of a single galaxy is limited, I will present
+    preliminary results that place significant cosmological constraints from
+    hierarchical population inference of photometry from thousands of SDSS
+    galaxies. Furthermore, I will discuss domain adaptation (TNG versus SIMBA)
+    and challenges in SED modeling, which underpins the connection between the
+    simulations and observations. Lastly, I will discuss the potential of
+    extending this work to upcoming surveys (*e.g.* DESI, PFS, Rubin).
 \end{abstract}
 
 \keywords{
@@ -111,6 +128,8 @@ keyword1 -- keyword2 -- keyword3
 \input{sims}
 % --- results ---  
 \input{results}
+% --- discuss ---  
+\input{discuss}
 % --- summary ---  
 \input{summary}
 
@@ -118,6 +137,7 @@ keyword1 -- keyword2 -- keyword3
 It's a pleasure to thank
 
 \appendix
+\input{valid}
 
 \bibliographystyle{mnras}
 \bibliography{cgpop} 
