@@ -14,13 +14,13 @@ from tensorboard.backend.event_processing.event_accumulator import EventAccumula
 
 
 if os.environ['machine'] == 'della': 
-    dat_dir = '/scratch/gpfs/chhahn/haloflow/'
+    dat_dir = '/tigress/chhahn/goleta/'
 else: 
     raise ValueError
 
 
 def read_best_ndes(study_name, n_ensemble=5, device='cpu'): 
-    fevents = glob.glob(os.path.join(dat_dir, 'nde/%s/*/events*' % study_name))
+    fevents = glob.glob(os.path.join(dat_dir, 'ndes/%s/*/events*' % study_name))
 
     events, best_valid = [], []
     for fevent in fevents: 
@@ -43,7 +43,7 @@ def read_best_ndes(study_name, n_ensemble=5, device='cpu'):
     
     qphis = []
     for i_model in i_models: 
-        fqphi = os.path.join(dat_dir, 'nde/%s/%s.%i.pt' % (study_name, study_name, i_model))
+        fqphi = os.path.join(dat_dir, 'ndes/%s/%s.%i.pt' % (study_name, study_name, i_model))
         qphi = torch.load(fqphi, map_location=device)
         qphis.append(qphi)
 
