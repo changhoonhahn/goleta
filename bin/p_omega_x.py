@@ -7,6 +7,7 @@ script to estimate the distribution: p(Omega | X)
 import os
 import h5py 
 import numpy as np
+from goleta import data as D 
 
 import torch
 from torch.utils.tensorboard.writer import SummaryWriter
@@ -18,7 +19,7 @@ from sbi import inference as Inference
 
 device = ("cuda" if torch.cuda.is_available() else "cpu")
 
-output_dir = '/tigress/chhahn/cgpop/ndes/'
+output_dir = '/tigress/chhahn/goleta/ndes/'
 
 seed = 12387
 torch.manual_seed(seed)
@@ -28,11 +29,7 @@ if torch.cuda.is_available():
 ###################################################################
 # load CAMELS training data 
 ###################################################################
-dat_dir = '/tigress/chhahn/cgpop/'
-data = np.loadtxt(os.path.join(dat_dir, 'camels_tng.omega_x.down.dat'), skiprows=1, unpack=True)
-
-data_omega = data.T[:,:6]     # cosmological and hydrodynamical parameters
-data_photo = data.T[:,6:]     # measured photometry and noise
+y_train, x_train    = D.get_data('train', 'omega', 'xobs', sim='tng', downsample=True) 
 
 ###################################################################
 # train normalizing flows
@@ -44,18 +41,6 @@ lower_bounds = torch.tensor(prior_low)
 upper_bounds = torch.tensor(prior_high)
 
 prior = Ut.BoxUniform(low=lower_bounds, high=upper_bounds, device=device)
-
-# setup training data 
-ishuffle = np.arange(data_omega.shape[0])
-np.random.shuffle(ishuffle)
-
-N_train = int(0.9 * data_omega.shape[0])
-x_train = data_photo[ishuffle[:N_train]]
-y_train = data_omega[ishuffle[:N_train]]
-
-N_test = data_omega.shape[0] - N_train
-x_test = data_photo[ishuffle[N_train:]]
-y_test = data_omega[ishuffle[N_train:]]
 
 # Optuna Parameters
 n_trials    = 1000
@@ -115,27 +100,8 @@ def Objective(trial):
     fqphi   = os.path.join(output_dir, study_name, '%s.%i.pt' % (study_name, trial.number))
     torch.save(qphi, fqphi)
 
-    # calculat ranks:  
-    rank_thetas = []
-    for i in range(x_test.shape[0]):
-        # sample posterior p(theta | x_test_i)
-        y_prime = qphi.sample((10000,),
-                x=torch.as_tensor(x_test[i].astype(np.float32)).to(device),
-                show_progress_bars=False)
-        y_prime = np.array(y_prime.detach().cpu())
-
-        # calculate percentile score and rank
-        rank_theta = []
-        for itheta in range(y_test.shape[1]):
-            rank_theta.append(np.sum(y_prime[:,itheta] < y_test[i,itheta]))
-        rank_thetas.append(rank_theta)
-    rank_thetas = np.array(rank_thetas) 
-
-    np.save(os.path.join(output_dir, study_name, '%s.%i.rank.npy' % (study_name, trial.number)), rank_thetas)
-        
     best_valid_log_prob = anpe._summary['best_validation_log_prob'][0]
     return -1*best_valid_log_prob
-
 
 sampler     = optuna.samplers.TPESampler(n_startup_trials=n_startup_trials)
 study       = optuna.create_study(study_name=study_name, sampler=sampler, storage=storage, directions=["minimize"], load_if_exists=True)
