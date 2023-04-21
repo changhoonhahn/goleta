@@ -123,3 +123,45 @@ def get_data(dataset, yname, xname, sim='tng', downsample=True):
 
     return y, x 
 
+
+def get_obs(cut='v0'): 
+    ''' get absolute magnitude of NASA-Slan Atlas galaxies  
+    '''
+    # read NSA catlaog
+    nsa = Table.read(os.path.join(dat_dir, 'nsa_v0_1_2.fits'))
+    
+    # get k-correction absolute magnitudes
+    absmag_nsa = np.array(nsa['ABSMAG'].data)[:,3:] # g, r, i, z
+    ivar_absmag_nsa = np.array(nsa['AMIVAR'].data)[:,3:]
+    
+    cuts = (nsa['Z'] < 0.05) # training data is only at z=0 
+
+    if cut == 'v0': # first cut  
+        colors_nsa = np.array([absmag_nsa[:,0] - absmag_nsa[:,1],
+                                 absmag_nsa[:,0] - absmag_nsa[:,2],
+                                 absmag_nsa[:,0] - absmag_nsa[:,3],
+                                 absmag_nsa[:,1] - absmag_nsa[:,2],
+                                 absmag_nsa[:,1] - absmag_nsa[:,3],
+                                 absmag_nsa[:,2] - absmag_nsa[:,3]]).T
+
+        # cuts on absmag uncertainties
+        cuts =  (cuts & 
+                (np.all(
+                    (ivar_absmag_nsa[:,:-1]**-0.5 > 0.02) & (ivar_absmag_nsa[:,:-1]**-0.5 < 0.022), axis=1) &
+                    (ivar_absmag_nsa[:,-1]**-0.5 > 0.03) & (ivar_absmag_nsa[:,-1]**-0.5 < 0.04)))
+
+        # cuts on absmag
+        for i in range(4):
+            cuts = cuts & (absmag_nsa[:,i] < -18) & (absmag_nsa[:,i] > -22.)
+
+        # cuts on color
+        cuts = cuts & (colors_nsa[:,0] > 0.264) & (colors_nsa[:,0] < 0.687)
+        cuts = cuts & (colors_nsa[:,1] > 0.423) & (colors_nsa[:,1] < 1.009)
+        cuts = cuts & (colors_nsa[:,2] > 0.538) & (colors_nsa[:,2] < 1.231)
+        cuts = cuts & (colors_nsa[:,3] > 0.151) & (colors_nsa[:,3] < 0.329)
+        cuts = cuts & (colors_nsa[:,4] > 0.263) & (colors_nsa[:,4] < 0.557)
+        cuts = cuts & (colors_nsa[:,5] > 0.097) & (colors_nsa[:,5] < 0.241)
+
+    print('%i observed galaxies' % np.sum(cuts))
+    Xs = np.concatenate([absmag_nsa[cuts], ivar_absmag_nsa[cuts]**-0.5], axis=1)
+    return Xs
