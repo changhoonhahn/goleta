@@ -102,8 +102,7 @@ transformation, $f$, that maps a complex target distribution to a simple base
 distribution that is fast to evaluate.
 $f$ is defined to be invertible and have a tractable Jacobian so that the 
 target distribution can be evaluated with change of variables. 
-Since $\pi(\bfi{z})$ is easy to evaluate, this enables us to also easily 
-evaluate the target distribution.
+%Since $\pi(\bfi{z})$ is easy to evaluate, this enables us to also easily evaluate the target distribution.
 In our case, the target distribution is 
 $p(\Omega, \mathcal{B}\given {\bfi X_i})$ and we set the base distribution to
 be a multivariate Gaussian. 
@@ -128,9 +127,9 @@ tejero-cantero2020}.
 \vskip -0.2in
 \end{figure}
 
-Our goal in training the flow is to determine $q_\phi$ that best approximates 
+Our goal in training is to determine $q_\phi$ that best approximates 
 $p(\Omega, \mathcal{B}\given {\bfi X_i})$. 
-We can reformulate this into an optimization problem for determining $\phi$
+We can reformulate this into an optimization problem: determining $\phi$
 that minimizes the KL divergence between 
 $p(\Omega, \mathcal{B}, {\bfi X_i}) = p(\Omega, \mathcal{B}\given {\bfi X_i})
  p({\bfi X_i})$ and
@@ -159,7 +158,6 @@ To validate the accuracy of $q_\phi$, we use the ``distance to random point''
 show that a posterior estimator is optimal. 
 In Fig~\ref{fig:tarp}, we present the DRP coverage of $q_\phi$ (blue) and
 find that it provides a near optimal estimate of the true posterior.
-
 
 \begin{figure}[ht]
 \vskip 0.2in

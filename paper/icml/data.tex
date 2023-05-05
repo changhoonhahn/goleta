@@ -66,23 +66,25 @@ $A_{\rm SN1}$ and $A_{\rm SN2}$ represent the normalization factors for the
 galactic wind flux and speed; 
 $A_{\rm AGN1}$ and $A_{\rm AGN2}$ represent the normalization factors for the 
 energy output and specific energy of AGN feedback.
-
-The CAMELS-TNG simulation all have a comoving volume of 
-(25 $h^{-1}{\rm Mpc}$)$^3$.
-They each evolve $256^3$ dark matter particles and $256^3$ fluid elements from
-$z=127$ to $z=0$ from initial conditions generated using second order
-perturbation theory. 
-Each simulation has 34 saved snapshots from $z=6$ to $z=0$. 
-Since we target $z < 0.05$ NSA galaxies, we only use the $z=0$ snapshot. 
 All the cosmological parameter besides $\Omega_m$ and $\sigma_8$ are fixed:
 $\Omega_b = 0.049$, $h = 0.6711$, $n_s = 0.9624$, $\sum m_\nu = 0.0$eV, and 
 $w = -1$.
-The SUBFIND~\citep{springel2001, dolag2009} algorithm is run on each simulation
-to identify halos and subhalos.
-SUBFIND computes physical quantities of the subhalos and the galaxies that
-resides in them. 
-For additional details on CAMELS, we refer readers to
-\cite{villaescusa-navarro2021, villaescusa-navarro2022a}.
+%The CAMELS-TNG simulation all have a comoving volume of 
+%(25 $h^{-1}{\rm Mpc}$)$^3$.
+%They each evolve $256^3$ dark matter particles and $256^3$ fluid elements from
+%$z=127$ to $z=0$ from initial conditions generated using second order
+%perturbation theory. 
+%Each simulation has 34 saved snapshots from $z=6$ to $z=0$. 
+%Since we target $z < 0.05$ NSA galaxies, we only use the $z=0$ snapshot. 
+%All the cosmological parameter besides $\Omega_m$ and $\sigma_8$ are fixed:
+%$\Omega_b = 0.049$, $h = 0.6711$, $n_s = 0.9624$, $\sum m_\nu = 0.0$eV, and 
+%$w = -1$.
+%The SUBFIND~\citep{springel2001, dolag2009} algorithm is run on each simulation
+%to identify halos and subhalos.
+%SUBFIND computes physical quantities of the subhalos and the galaxies that
+%resides in them. 
+%For additional details on CAMELS, we refer readers to
+%\cite{villaescusa-navarro2021, villaescusa-navarro2022a}.
 
 In all 1,000 CAMELS-TNG simulations, there are $\sim$700,000 galaxies with more
 than 20 star particles. 
@@ -107,24 +109,21 @@ using stellar population synthesis (SPS) based on the recorded birth time,
 metallicity, and mass. 
 The SPS uses FSPS~\citep{conroy2009, conroy2010}, Padova isochrones, MILES
 stellar library, and assumes a Chabrier initial mass function. 
-The unattenuated galaxy SEDs are then dust attenuated using the ``Model C'' dust
-model of \cite{nelson2018}, which is based on the metal content of the neutral
-gas distribution in and around each galaxy. 
-Afterwards, each galaxy SED is convolved with the SDSS $g$, $r$, $i$, $z$-band
-photometric bandpasses to produce the photometry: $X_i$. 
-For additional details on the synthetic photometry, we refer readers to
-\cite{nelson2018}. 
+The unattenuated galaxy SEDs are then attenuated using a dust model based on
+the metal content of the neutral gas distribution in and around each
+galaxy~\citep[Model C in][]{nelson2018}. 
+Afterwards, the SED is convolved with SDSS $g$, $r$, $i$, $z$-band photometric
+bandpasses to produce the photometry: $X_i$. 
+%For additional details on the synthetic photometry, we refer readers to \cite{nelson2018}. 
 
-The synthetic photometry in CAMELS-TNG does not include any uncertainties.
-However, since we have measured uncertainties, $\sigma_X$, for NSA galaxies, we
-can construct a realistic noise model. 
-For each CAMELS-TNG galaxy, we randomly sample $\sigma_{X,i}$ from the range of
-uncertainties measured in NSA. 
+Next, we add noise to the CAMELS-TNG synthetic photometry based on the measured
+uncertainties, $\sigma_X$, of NSA galaxies. 
+For each alaxy, we randomly sample $\sigma_{X,i}$ from the range of uncertainties 
+measured in NSA. 
 Afterwards, we apply the uncertainty using a Gaussian with standard deviation
 $\sigma_{X,i}$: $\hat{X}_i \sim \mathcal{N}(X_i, \sigma_{X, i})$. 
-Our noise model does not include correlations between the magnitudes and the
-uncertainties. 
-However, as we later discuss, this is not an issue in our approach beacuse the
-posteriors we ultimately evaluate are conditioned on the uncertainties. 
+Although our noise model is overly simplistic, this is not an issue in our
+approach beacuse the posteriors we ultimately evaluate are conditioned on the
+uncertainties~\citep{hahn2022a}. 
 In Fig.~\ref{fig:nsa}, we present the color-magnitude distribution of the
 forward modeled CAMELS-TNG galaxies in blue. 
