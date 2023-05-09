@@ -1,0 +1,30 @@
+\section{Observations: NASA-Sloan Atlas}  \label{sec:nsa}
+In this work, we analyze observed galaxy photometry from the NASA-Sloan
+Atlas\footnote{\url{http://www.nsatlas.org/}} (hereafter NSA).
+The NSA provides photometry of $z < 0.05$ galaxies observed by the Sloan
+Digital Sky Survey~\citep[SDSS;][]{aihara2011} Data Release 8 with improved
+background subtraction~\citep{blanton2011}. 
+We use optical $g$, $r$, $i$, $z$ band absoluate magnitudes derived using 
+{\sc kcorrect}~\citep{blanton2007}, assuming a
+\cite{chabrier2003} initial mass function (IMF). 
+In Fig.~\ref{fig:nsa}, we present the $(g - r) - M_r$ color-magnitude
+distribution of $\sim$120,000 NSA galaxies (black).
+
+Out of the full NSA sample, we focus on luminous galaxies with 
+$-18 > M_r > -22$.
+%We exclude galaxies brighter than $M_r > -22$ since our simulated galaxy sample does not include a large number of the most luminous galaxies due to cosmic variance. 
+In addition, we only select galaxies with precisely measured photometry: 
+magnitude uncertainties below $\sigma_g, \sigma_r, \sigma_i < 0.022$ and 
+$\sigma_z < 0.04$. 
+Lastly, we impose the color cuts to exclude galaxies outside the central 68
+percentile of the $g-r$, $g-i$, $g-z$, $r-i$, $r-z$, $i-z$ color
+distributions.
+The color cuts remove NSA galaxies that potentially have observational
+artifacts or problematic photometry.
+They also ensure that the NSA galaxies are within the photometric distribution
+(\ie~support) of our simulated galaxies.
+We mark the 95$^{th}$ percentile contour of our NSA subsample in
+Fig.~\ref{fig:nsa} (black dot-dashed).
+In total, we use 14,736 NSA galaxies.
+
+

@@ -1,1 +1,49 @@
 \section{Introduction} \label{sec:intro} 
+In recent work, \cite{villaescusa-navarro2022} showed that it is possible to
+place cosmological constraints from only the internal properties of a single
+galaxy.  
+They used galaxies from 2,000 state-of-the-art hydrodynamical simulations with
+different cosmologies and astrophysical models from
+CAMELS~\citep{villaescusa-navarro2021, villaescusa-navarro2022a} to train
+moment networks~\citep{jeffrey2020a} that predict cosmological parameters from
+galaxy properties. 
+With only a handful of galaxy properties, including stellar mass ($M_*$),
+stellar metallicity ($Z_*$), and maximum circular velocity ($V_{\rm max}$),
+they were able to constrain $\Omega_m$ to 10\% precision with a single galaxy.
+They found similar constraining power for galaxies simulated using the subgrid
+physics models of the IllustrisTNG~\citep{pillepich2018, weinberger2018} and
+SIMBA~\citep{dave2019}. 
+Since then, follow-up works have found consistent results for other
+hydrodynamicl models: \citep{echeverri2023}. 
+
+
+According to \citep{villaescusa-navarro2021}, the cosmological information is
+derived from the imprint of $\Omega_m$ on the dark matter content of galaxies,
+which is distinct from astrophysical processes. 
+Also, since $\Omega_b$ is fixed in CAMELS, which is justified by the tight
+constraints from Big Bang Nucleosynthesis, the galaxy properties are
+effectively measuring the baryon fraction, $\Omega_b/\Omega_m$.
+For instance, $V_{\rm max}$ measures the total matter content while other
+properties like $M_*$ and $Z_*$ measures the mass in baryons so together they
+can constrain the ratio $\Omega_b/\Omega_m$.
+In fact, a similar approach was used three deacdes ago in \citep{white1993} to
+constrain $\Omega_b/\Omega_m$  using galaxy clusters. 
+
+Despite the promising signs that they may be useful cosmological probes, galaxy
+properties themselves are {\em not} actual observable.
+They are derived quantities that are typically inferred from photometry or
+spectra of galaxies and require modeling the spectral energy distribution
+(SED) or emission lines~\citep{conroy2013}.
+In this work, we go beyond the theoretical considerations of previous works and
+infer cosmological parameters from actual galaxy observables --- optical  
+photometry.  
+We leverage a simulation-based inference method that employs neural density
+estimation to estimate the posterior of cosmological parameters given galaxy
+photometry, similar to the approach of \cite{hahn2022a}. 
+Furthermore, since we expect a limited amount of cosmological information from
+the photometry of a single galaxy, we present a hierarhical population
+inference approach for inferring the posterior of cosmological parameters
+from the photometry of multiple galaxies. 
+Lastly, we present the cosmological constraints derived from applying this
+approach to the photometry of $\sim$15,000 SDSS galaxies from the NASA-Sloan
+Atlas (Sec.~\ref{sec:nsa}). 
