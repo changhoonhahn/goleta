@@ -2,8 +2,8 @@
 \subsection{Hierarchical Bayesian Inference} \label{sec:hier} 
 Our goal is to infer the posterior of cosmological parameters
 $\Omega = \{ \Omega_m, \sigma_8 \}$ and baryonic feedback parameters
-$\mathcal{B} = \{ A_{\rm SN1}, A_{\rm SN2}, A_{\rm AGN1}, A_{\rm AGN2}\}$ from
-the observed photometry of galaxies in the NSA catalog, $\{\bfi X_i\}$:
+$\mathcal{B}$ from the observed photometry of galaxies in the NSA catalog,
+$\{\bfi X_i\}$:
 $p(\Omega, \mathcal{B} \given \{{\bfi X_i}\})$.
 ${\bfi X_i}$ represents both the measured absolute magnitudes and
 uncertainties: $\{ \hat{X}_i, \sigma_{X,i}\}$. 
@@ -23,9 +23,10 @@ Then the noisy photometry $\hat{X}_i$ is determined from $\theta_i^g$ through
 SPS and our noise model. 
 
 \begin{figure}[ht]
-\vskip 0.2in
+%\vskip 0.2in
 \begin{center}
     \centerline{\includegraphics[width=0.5\columnwidth]{figs/graph.pdf}}
+    \vskip -0.1in
     \caption{
         Graphical representation of our hierarchical approach that illustrate
         the relationship among the parameters of our model. 
@@ -38,7 +39,7 @@ SPS and our noise model.
         $\theta^g_i$ using SPS and our noise model. 
     }\label{fig:graph}
 \end{center}
-\vskip -0.2in
+\vskip -0.3in
 \end{figure}
 
 We can rewrite the posterior as: 
@@ -71,8 +72,7 @@ p(\Omega, \mathcal{B} \given \{{\bfi X_i}\})
     =&~\frac{1}{p(\Omega, \mathcal{B})^{N-1}}\prod\limits_{i=1}^N p(\Omega,
     \mathcal{B}\given {\bfi X_i})
 \end{align} 
-We downsampled the galaxies in the CAMELS-TNG simulations to impose 
-$p(\Omega, \mathcal{B}) = 1$ (Sec.~\ref{sec:sims}), so:
+Since $p(\Omega, \mathcal{B}) = 1$ (Sec.~\ref{sec:sims}):
 \begin{align}
 p(\Omega, \mathcal{B} \given \{{\bfi X_i}\}) 
     =&~\prod\limits_{i=1}^N p(\Omega, \mathcal{B}\given {\bfi X_i}).
@@ -91,9 +91,9 @@ With NDE, we can use this data to train a neural network $q$ with parameters
 $\phi$ to estimate 
 $p(\Omega, \mathcal{B}\given {\bfi X_i}) \approx
 q_\phi(\Omega, \mathcal{B}\given {\bfi X_i})$.
-This type of simulaiton-based inference using NDE has been applied to a broad
+This type of simulation-based inference using NDE has been applied to a broad
 range of astronomical applications~\citep[\eg~][]{wong2020, dax2021, zhang2021,
-hahn2022a, hahn2022d, hahn2023}. 
+hahn2022d}. 
 
 In this work, our NDE is based on ``normalizing flow'' models~\citep{tabak2010,
 tabak2013}, which use neural networks to learn a flexible and bijective
@@ -128,25 +128,26 @@ data at every training epoch and stop the training when the validation
 log-likelihood fails to increase after 20 epochs.  
 
 We train a large number of flows with architectures determined by the
-\cite{akiba2019} hyperparameter optimization framework.
+Akiba~et~al.~\yrcite{akiba2019} hyperparameter optimization.
 Then, we construct our final flow as an equally weighted ensemble of five
 flows with the lowest validation losses: 
 $q_{\phi}(\Omega, \mathcal{B}\given {\bfi X_i}) = 
 \sum_{j=1}^5 q_{\phi,j}(\Omega, \mathcal{B}\given {\bfi X_i})/5$. 
 Ensembling flows with different initializations and architectures improves the
-overall robustness of our normalizing flow~\citep{alsing2019}.
+overall robustness of our normalizing flow.
 In Appendix~\ref{sec:valid}, we extensively validate the accuracy of $q_\phi$,
-using Simulation-Based Calibration~\citep{talts2020} and the ``distance to
-random point'' coverage test from \cite{lemos2023}. 
+using Simulation-Based Calibration~\citep{talts2020} and the
+Lemos~et~al.~\yrcite{lemos2023} coverage test. 
 Our final flow is a near optimal estimate of the true posterior. 
 
 \begin{figure}[ht]
-\vskip 0.2in
+%\vskip 0.1in
 \begin{center}
     \centerline{\includegraphics[width=\columnwidth]{figs/p_omega_x_i.pdf}}
+    \vskip -0.1in
     \caption{Estimated posteriors of the cosmological and hydrodynamical 
     parameters ($\Omega$, $\mathcal{B}$) from photometry, 
-    $q_{\phi}(\Omega, \mathcal{B}\given {\bfi X_i})$,for three arbitrarily 
+    $q_{\phi}(\Omega, \mathcal{B}\given {\bfi X_i})$, for three arbitrarily 
     selected NSA galaxies. 
     The posteriors correspond to the galaxies marked in Fig.~\ref{fig:nsa}.
     The photometry of a single galaxy contains limited cosmological

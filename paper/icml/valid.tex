@@ -4,7 +4,7 @@ individual posterior from NDE:
 $p(\Omega, \mathcal{B}\given {\bfi X_i}) \approx q_\phi(\Omega, \mathcal{B}\given {\bfi X_i})$
 (Sec.~\ref{sec:anpe}). 
 To validate $q_\phi$, we use 10\% of the CAMELS-TNG data reserved for testing
-and two validation methods: (1) Simulation-Based Calilibration (SBC) and (2)
+and two validation methods: (1) Simulation-Based Calibration (SBC) and (2)
 the ``distance to random point'' (DRP) coverage test. 
 
 \begin{figure}[ht]
@@ -30,7 +30,7 @@ the ``distance to random point'' (DRP) coverage test.
 \end{figure}
 
 Both are variations of the standard coverage test, where $q_\phi$ is applied to
-test samples, not used for training. 
+test samples not used for training. 
 The posterior of each test sample is compared against the true parameter value
 its percentile score is calculated.
 Afterwards, cummulative distribution function (CDF) of the percentile is used

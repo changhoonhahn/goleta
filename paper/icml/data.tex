@@ -1,8 +1,9 @@
 \section{Forward Model: CAMELS} \label{sec:sims}
 \begin{figure}[ht]
-\vskip 0.2in
+%\vskip 0.2in
 \begin{center}
-    \centerline{\includegraphics[width=\columnwidth]{figs/nsa.pdf}}
+    \centerline{\includegraphics[width=0.9\columnwidth]{figs/nsa.pdf}} 
+    \vskip -0.1in
     \caption{Color-magnitude distrubtion, $(g-r) - M_r$, of observed galaxies
     from the NSA (black) and simulated galaxies from CAMELS-TNG (blue). 
     Overall, the distributions of NSA and CAMELS-TNG galaxies are in good
@@ -12,15 +13,15 @@
     feedback parameters.
     }\label{fig:nsa}
 \end{center}
-\vskip -0.2in
+\vskip -0.3in
 \end{figure}
 
-We use simulated galaxies from the CAMELS, a suite of hydrodynamical
+We use simulated galaxies from CAMELS, a suite of hydrodynamical
 simulations constructed over a wide range of cosmological and
 hydrodynamical parameters.
 In particular, we use the 1,000 hydrodynamical simulations constructed using
 the state-of-the-art IllustrisTNG model (CAMELS-TNG). 
-The simulations are generated with different cosmoloigcal parameters,
+The simulations are generated with different cosmological parameters,
 $\Omega = \{\Omega_m, \sigma_8\}$, and baryonic feedback parameters, 
 $\mathcal{B} = \{A_{\rm SN1}, A_{\rm SN2}, A_{\rm AGN1}, A_{\rm AGN2}\}$,
 arranged in a latin hypercube. 
@@ -46,8 +47,8 @@ energy output and specific energy of AGN feedback.
 %For additional details on CAMELS, we refer readers to
 %\cite{villaescusa-navarro2021, villaescusa-navarro2022a}.
 
-In the 1,000 simulations, there are $\sim$700,000 galaxies with more than 20
-star particles. 
+In the 1,000 simulations, there are $\sim$700,000 galaxies with 
+$M_* > 2\times10^8 M_\odot/h$. 
 The galaxies, however, are not evenly distributed across them and have a
 significant dependence on the parameters.  
 For instance, simulations constructed at higher $\Omega_m$ values have more
@@ -66,7 +67,7 @@ star particle of the host subhalo.
 Each SED is modeled as a single-burst simple stellar population using stellar
 population synthesis (SPS) based on the recorded birth time, metallicity, and
 mass. 
-The SPS uses FSPS~\citep{conroy2009, conroy2010}, Padova isochrones, MILES
+The SPS uses FSPS~\citep{conroy2009}, Padova isochrones, MILES
 stellar library, and assumes a Chabrier initial mass function. 
 The unattenuated galaxy SEDs are then attenuated using a dust model based on
 the metal content of the neutral gas distribution in and around each
@@ -77,7 +78,7 @@ bandpasses to produce the photometry: $X_i$.
 
 Next, we add noise to the synthetic photometry based on the measured
 uncertainties, $\sigma_X$, of NSA galaxies. 
-For each alaxy, we randomly sample $\sigma_{X,i}$ from the range of
+For each galaxy, we randomly sample $\sigma_{X,i}$ from the range of
 uncertainties measured in NSA. 
 Afterwards, we apply the uncertainty using a Gaussian with standard deviation
 $\sigma_{X,i}$: $\hat{X}_i \sim \mathcal{N}(X_i, \sigma_{X, i})$. 
