@@ -19,7 +19,7 @@ else:
     raise ValueError
 
 
-def read_best_ndes(study_name, n_ensemble=5, device='cpu'): 
+def read_best_ndes(study_name, n_ensemble=5, device='cpu', return_i_models=False): 
     fevents = glob.glob(os.path.join(dat_dir, 'ndes/%s/*/events*' % study_name))
 
     events, best_valid = [], []
@@ -46,5 +46,8 @@ def read_best_ndes(study_name, n_ensemble=5, device='cpu'):
         fqphi = os.path.join(dat_dir, 'ndes/%s/%s.%i.pt' % (study_name, study_name, i_model))
         qphi = torch.load(fqphi, map_location=device)
         qphis.append(qphi)
-
-    return qphis
+    
+    if not return_i_models: 
+        return qphis
+    else: 
+        return qphis, i_models

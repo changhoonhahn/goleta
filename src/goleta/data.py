@@ -130,38 +130,54 @@ def get_obs(cut='v0'):
     # read NSA catlaog
     nsa = Table.read(os.path.join(dat_dir, 'nsa_v0_1_2.fits'))
     
-    # get k-correction absolute magnitudes
-    absmag_nsa = np.array(nsa['ABSMAG'].data)[:,3:] # g, r, i, z
-    ivar_absmag_nsa = np.array(nsa['AMIVAR'].data)[:,3:]
+    # get k-correction absolute magnitudes --- u, g, r, i, z
+    absmag_nsa = np.array(nsa['ABSMAG'].data)[:,2:]  
+    ivar_absmag_nsa = np.array(nsa['AMIVAR'].data)[:,2:]
+    sigmag_nsa = ivar_absmag_nsa**-0.5
     
     cuts = (nsa['Z'] < 0.05) # training data is only at z=0 
 
     if cut == 'v0': # first cut  
-        colors_nsa = np.array([absmag_nsa[:,0] - absmag_nsa[:,1],
-                                 absmag_nsa[:,0] - absmag_nsa[:,2],
-                                 absmag_nsa[:,0] - absmag_nsa[:,3],
-                                 absmag_nsa[:,1] - absmag_nsa[:,2],
-                                 absmag_nsa[:,1] - absmag_nsa[:,3],
-                                 absmag_nsa[:,2] - absmag_nsa[:,3]]).T
+        # cuts on absmag (roughly 68 percentile cuts) 
+        cuts = (cuts & 
+                (absmag_nsa[:,0] < -16) & (absmag_nsa[:,0] > -18.5) & 
+                (absmag_nsa[:,1] < -17) & (absmag_nsa[:,1] > -20.) & 
+                (absmag_nsa[:,2] < -17.5) & (absmag_nsa[:,2] > -21.) & 
+                (absmag_nsa[:,3] < -17.5) & (absmag_nsa[:,3] > -21.) & 
+                (absmag_nsa[:,4] < -17.5) & (absmag_nsa[:,4] > -21.))
 
         # cuts on absmag uncertainties
         cuts =  (cuts & 
-                (np.all(
-                    (ivar_absmag_nsa[:,:-1]**-0.5 > 0.02) & (ivar_absmag_nsa[:,:-1]**-0.5 < 0.022), axis=1) &
-                    (ivar_absmag_nsa[:,-1]**-0.5 > 0.03) & (ivar_absmag_nsa[:,-1]**-0.5 < 0.04)))
+                (sigmag_nsa[:,0] > 0.05) & (sigmag_nsa[:,0] < 0.08) &
+                (sigmag_nsa[:,1] > 0.02) & (sigmag_nsa[:,1] < 0.022) &
+                (sigmag_nsa[:,2] > 0.02) & (sigmag_nsa[:,2] < 0.022) &
+                (sigmag_nsa[:,3] > 0.02) & (sigmag_nsa[:,3] < 0.022) &
+                (sigmag_nsa[:,4] > 0.03) & (sigmag_nsa[:,4] < 0.04))
+        
+        colors_nsa = np.array([
+            absmag_nsa[:,0] - absmag_nsa[:,1],
+            absmag_nsa[:,0] - absmag_nsa[:,2],
+            absmag_nsa[:,0] - absmag_nsa[:,3],
+            absmag_nsa[:,0] - absmag_nsa[:,4],
+            absmag_nsa[:,1] - absmag_nsa[:,2],
+            absmag_nsa[:,1] - absmag_nsa[:,3],
+            absmag_nsa[:,1] - absmag_nsa[:,4],
+            absmag_nsa[:,2] - absmag_nsa[:,3],
+            absmag_nsa[:,2] - absmag_nsa[:,4],
+            absmag_nsa[:,3] - absmag_nsa[:,4]]).T
 
-        # cuts on absmag
-        for i in range(4):
-            cuts = cuts & (absmag_nsa[:,i] < -18) & (absmag_nsa[:,i] > -22.)
-
-        # cuts on color
-        cuts = cuts & (colors_nsa[:,0] > 0.264) & (colors_nsa[:,0] < 0.687)
-        cuts = cuts & (colors_nsa[:,1] > 0.423) & (colors_nsa[:,1] < 1.009)
-        cuts = cuts & (colors_nsa[:,2] > 0.538) & (colors_nsa[:,2] < 1.231)
-        cuts = cuts & (colors_nsa[:,3] > 0.151) & (colors_nsa[:,3] < 0.329)
-        cuts = cuts & (colors_nsa[:,4] > 0.263) & (colors_nsa[:,4] < 0.557)
-        cuts = cuts & (colors_nsa[:,5] > 0.097) & (colors_nsa[:,5] < 0.241)
+        # cuts on color 16 and 84th percentiles of each color 
+        cuts = cuts & (colors_nsa[:,0] > 0.835) & (colors_nsa[:,0] < 1.660)
+        cuts = cuts & (colors_nsa[:,1] > 1.202) & (colors_nsa[:,1] < 2.445)
+        cuts = cuts & (colors_nsa[:,2] > 1.324) & (colors_nsa[:,2] < 2.811)
+        cuts = cuts & (colors_nsa[:,3] > 1.420) & (colors_nsa[:,3] < 3.072)
+        cuts = cuts & (colors_nsa[:,4] > 0.366) & (colors_nsa[:,4] < 0.785)
+        cuts = cuts & (colors_nsa[:,5] > 0.484) & (colors_nsa[:,5] < 1.154)
+        cuts = cuts & (colors_nsa[:,6] > 0.578) & (colors_nsa[:,6] < 1.421)
+        cuts = cuts & (colors_nsa[:,7] > 0.109) & (colors_nsa[:,7] < 0.377)
+        cuts = cuts & (colors_nsa[:,8] > 0.201) & (colors_nsa[:,8] < 0.648)
+        cuts = cuts & (colors_nsa[:,9] > 0.074) & (colors_nsa[:,9] < 0.288)
 
     print('%i observed galaxies' % np.sum(cuts))
-    Xs = np.concatenate([absmag_nsa[cuts], ivar_absmag_nsa[cuts]**-0.5], axis=1)
+    Xs = np.concatenate([absmag_nsa[cuts], sigmag_nsa[cuts]], axis=1)
     return Xs
