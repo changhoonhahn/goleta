@@ -22,7 +22,7 @@ def get_data(dataset, yname, xname, sim='tng', downsample=True):
     if not downsample: raise NotImplementedError 
 
     fdata = os.path.join(dat_dir, 
-            'camels_%s%s.%s.dat' % (sim, ['', '.down'][downsample], dataset))
+            'camels_%s.v2%s.%s.dat' % (sim, ['', '.down'][downsample], dataset))
     
     if not os.path.isfile(fdata): 
         with h5py.File(os.path.join(dat_dir, '%s.snap33.subfind.galaxies.LHC.hdf5' % sim), 'r') as f: 
@@ -44,7 +44,6 @@ def get_data(dataset, yname, xname, sim='tng', downsample=True):
 
         icosmo = [0, 1, 2, 3, 4, 5] # cosmological/hydro parameters
         igals = [6, 7, 10, 13, 17] # intrinsic properties of galaixes (Mg, M*, Vmax, Z*, R*)
-        iobs = [-4, -3, -2, -1] # g, r, i, z absolute magnitudes
 
         ikeep = [] 
         w_lhc = np.ones(props.shape[0])
@@ -57,11 +56,27 @@ def get_data(dataset, yname, xname, sim='tng', downsample=True):
             
             ikeep.append(np.random.choice(np.arange(props.shape[0])[is_lhc], size=100, replace=False))
         ikeep = np.concatenate(ikeep)
+        
+        if sim == 'tng': 
+            ## load Chris's u, g, r, i, z absolute magnitudes 
+            #absmag_nonoise = np.loadtxt(os.path.join(dat_dir, 'tng_lovell.matched.sdss_ugriz.dat'), skiprows=1) 
 
-        # forward model 
-        absmag_sigmas = np.random.uniform(0.019, 0.023, size=(props.shape[0], len(iobs)))
-        absmag_sigmas[:,-1] = np.random.uniform(0.029, 0.041, size=props.shape[0])
-        absmags = props[:,np.array(iobs)] + absmag_sigmas * np.random.normal(size=(props.shape[0], len(iobs)))
+            # load CAMELS g, r, i, z absolute magnitudes with TNG dust emulator 
+            absmag_nonoise = np.loadtxt(os.path.join(dat_dir, 'tng.snap33.subfind.galaxies.LHC.sdss_griz.tng_dust_emu.dat'), 
+                    skiprows=1) 
+
+            # forward model 
+            absmag_sigmas = np.zeros((props.shape[0], 4))
+            #absmag_sigmas[:,0] = np.random.uniform(0.049, 0.081, size=props.shape[0]) # u 
+            absmag_sigmas[:,0] = np.random.uniform(0.019, 0.023, size=props.shape[0]) # g 
+            absmag_sigmas[:,1] = np.random.uniform(0.019, 0.023, size=props.shape[0]) # r 
+            absmag_sigmas[:,2] = np.random.uniform(0.019, 0.023, size=props.shape[0]) # i
+            absmag_sigmas[:,3] = np.random.uniform(0.029, 0.041, size=props.shape[0]) # z
+
+            absmags = absmag_nonoise + absmag_sigmas * np.random.normal(size=(props.shape[0], 4))
+        else:
+            absmags = np.zeros((props.shape[0], 4))
+            absmag_sigmas = np.zeros((props.shape[0], 4))
     
         # full data set 
         ishuffle = np.arange(props.shape[0])
@@ -74,13 +89,13 @@ def get_data(dataset, yname, xname, sim='tng', downsample=True):
 
         _output = np.concatenate([props[:,icosmo], props[:,igals], 
             absmags, absmag_sigmas, w_lhc[:,None]], axis=1)
-        _fdata = os.path.join(dat_dir, 'camels_%s.all.dat' % sim)
+        _fdata = os.path.join(dat_dir, 'camels_%s.v2.all.dat' % sim)
         np.savetxt(_fdata, _output, header=hdr)
 
-        _fdata = os.path.join(dat_dir, 'camels_%s.train.dat' % sim)
+        _fdata = os.path.join(dat_dir, 'camels_%s.v2.train.dat' % sim)
         np.savetxt(_fdata, _output[ishuffle[:N_train]], header=hdr)
         
-        _fdata = os.path.join(dat_dir, 'camels_%s.test.dat' % sim)
+        _fdata = os.path.join(dat_dir, 'camels_%s.v2.test.dat' % sim)
         np.savetxt(_fdata, _output[ishuffle[N_train:]], header=hdr)
 
         # downsampled data set
@@ -92,13 +107,13 @@ def get_data(dataset, yname, xname, sim='tng', downsample=True):
         hdr = ('name: Omega_m, sigma_8, log A_SN1, log A_AGN1, log A_SN2, log A_AGN2, '+ 
                 'log M_g, log M_*, log V_max, log Z_*, log R_*, '+ 
                 'g absmag, r absmag, i, absmag, z absmag, sigma_g, sigma_r, sigma_i, sigma_z')
-        _fdata = os.path.join(dat_dir, 'camels_%s.down.all.dat' % sim)
+        _fdata = os.path.join(dat_dir, 'camels_%s.v2.down.all.dat' % sim)
         np.savetxt(_fdata, _output, header=hdr)
 
-        _fdata = os.path.join(dat_dir, 'camels_%s.down.train.dat' % sim)
+        _fdata = os.path.join(dat_dir, 'camels_%s.v2.down.train.dat' % sim)
         np.savetxt(_fdata, _output[ishuffle[:N_train]], header=hdr)
 
-        _fdata = os.path.join(dat_dir, 'camels_%s.down.test.dat' % sim)
+        _fdata = os.path.join(dat_dir, 'camels_%s.v2.down.test.dat' % sim)
         np.savetxt(_fdata, _output[ishuffle[N_train:]], header=hdr)
 
     data = np.loadtxt(fdata, skiprows=1)
@@ -108,7 +123,7 @@ def get_data(dataset, yname, xname, sim='tng', downsample=True):
     elif yname == 'theta': 
         y = data[:,6:11]
     elif yname == 'xobs':
-        y = data[:,11:19]
+        y = data[:,11:]
     else: 
         raise ValueError('specify yname') 
 
@@ -117,66 +132,57 @@ def get_data(dataset, yname, xname, sim='tng', downsample=True):
     elif xname == 'theta': 
         x = data[:,6:11]
     elif xname == 'xobs':
-        x = data[:,11:19]
+        x = data[:,11:]
     else: 
         raise ValueError('specify xname') 
 
     return y, x 
 
 
-def get_obs(cut='v0'): 
+def get_obs(cut='v1'): 
     ''' get absolute magnitude of NASA-Slan Atlas galaxies  
     '''
     # read NSA catlaog
     nsa = Table.read(os.path.join(dat_dir, 'nsa_v0_1_2.fits'))
     
     # get k-correction absolute magnitudes --- u, g, r, i, z
-    absmag_nsa = np.array(nsa['ABSMAG'].data)[:,2:]  
-    ivar_absmag_nsa = np.array(nsa['AMIVAR'].data)[:,2:]
+    absmag_nsa = np.array(nsa['ABSMAG'].data)[:,3:]
+    ivar_absmag_nsa = np.array(nsa['AMIVAR'].data)[:,3:]
     sigmag_nsa = ivar_absmag_nsa**-0.5
     
-    cuts = (nsa['Z'] < 0.05) # training data is only at z=0 
+    cuts = (np.all(np.isfinite(np.concatenate([absmag_nsa, sigmag_nsa], axis=1)), axis=1) & 
+        (nsa['Z'] < 0.05)) # training data is only at z=0 
 
-    if cut == 'v0': # first cut  
-        # cuts on absmag (roughly 68 percentile cuts) 
-        cuts = (cuts & 
-                (absmag_nsa[:,0] < -16) & (absmag_nsa[:,0] > -18.5) & 
-                (absmag_nsa[:,1] < -17) & (absmag_nsa[:,1] > -20.) & 
-                (absmag_nsa[:,2] < -17.5) & (absmag_nsa[:,2] > -21.) & 
-                (absmag_nsa[:,3] < -17.5) & (absmag_nsa[:,3] > -21.) & 
-                (absmag_nsa[:,4] < -17.5) & (absmag_nsa[:,4] > -21.))
-
+    if cut == 'v1': 
+        # conservative cut of the observation that only selects objects that lie
+        # at the very center of the magnitude, uncertainty, and color distributions.
+        
         # cuts on absmag uncertainties
         cuts =  (cuts & 
-                (sigmag_nsa[:,0] > 0.05) & (sigmag_nsa[:,0] < 0.08) &
+                (sigmag_nsa[:,0] > 0.02) & (sigmag_nsa[:,0] < 0.022) &
                 (sigmag_nsa[:,1] > 0.02) & (sigmag_nsa[:,1] < 0.022) &
                 (sigmag_nsa[:,2] > 0.02) & (sigmag_nsa[:,2] < 0.022) &
-                (sigmag_nsa[:,3] > 0.02) & (sigmag_nsa[:,3] < 0.022) &
-                (sigmag_nsa[:,4] > 0.03) & (sigmag_nsa[:,4] < 0.04))
+                (sigmag_nsa[:,3] > 0.03) & (sigmag_nsa[:,3] < 0.04))
+
+        # cuts on absmag 
+        cuts = (cuts & (absmag_nsa[:,1] < -18) & (absmag_nsa[:,1] > -22.))
         
         colors_nsa = np.array([
             absmag_nsa[:,0] - absmag_nsa[:,1],
             absmag_nsa[:,0] - absmag_nsa[:,2],
             absmag_nsa[:,0] - absmag_nsa[:,3],
-            absmag_nsa[:,0] - absmag_nsa[:,4],
             absmag_nsa[:,1] - absmag_nsa[:,2],
             absmag_nsa[:,1] - absmag_nsa[:,3],
-            absmag_nsa[:,1] - absmag_nsa[:,4],
-            absmag_nsa[:,2] - absmag_nsa[:,3],
-            absmag_nsa[:,2] - absmag_nsa[:,4],
-            absmag_nsa[:,3] - absmag_nsa[:,4]]).T
+            absmag_nsa[:,2] - absmag_nsa[:,3]]).T
 
-        # cuts on color 16 and 84th percentiles of each color 
-        cuts = cuts & (colors_nsa[:,0] > 0.835) & (colors_nsa[:,0] < 1.660)
-        cuts = cuts & (colors_nsa[:,1] > 1.202) & (colors_nsa[:,1] < 2.445)
-        cuts = cuts & (colors_nsa[:,2] > 1.324) & (colors_nsa[:,2] < 2.811)
-        cuts = cuts & (colors_nsa[:,3] > 1.420) & (colors_nsa[:,3] < 3.072)
-        cuts = cuts & (colors_nsa[:,4] > 0.366) & (colors_nsa[:,4] < 0.785)
-        cuts = cuts & (colors_nsa[:,5] > 0.484) & (colors_nsa[:,5] < 1.154)
-        cuts = cuts & (colors_nsa[:,6] > 0.578) & (colors_nsa[:,6] < 1.421)
-        cuts = cuts & (colors_nsa[:,7] > 0.109) & (colors_nsa[:,7] < 0.377)
-        cuts = cuts & (colors_nsa[:,8] > 0.201) & (colors_nsa[:,8] < 0.648)
-        cuts = cuts & (colors_nsa[:,9] > 0.074) & (colors_nsa[:,9] < 0.288)
+        # cuts on color. 
+        # 16 and 84th percentiles of the CAMELS color distribution 
+        cuts = cuts & (colors_nsa[:,0] > 0.313) & (colors_nsa[:,0] < 0.722)
+        cuts = cuts & (colors_nsa[:,1] > 0.510) & (colors_nsa[:,1] < 1.086)
+        cuts = cuts & (colors_nsa[:,2] > 0.670) & (colors_nsa[:,2] < 1.385)
+        cuts = cuts & (colors_nsa[:,3] > 0.190) & (colors_nsa[:,3] < 0.368)
+        cuts = cuts & (colors_nsa[:,4] > 0.345) & (colors_nsa[:,4] < 0.673)
+        cuts = cuts & (colors_nsa[:,5] > 0.142) & (colors_nsa[:,5] < 0.316)
 
     print('%i observed galaxies' % np.sum(cuts))
     Xs = np.concatenate([absmag_nsa[cuts], sigmag_nsa[cuts]], axis=1)
